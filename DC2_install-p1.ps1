@@ -1,4 +1,3 @@
-# --- SAISIES UTILISATEUR ---
 $NomMachine = Read-Host "Nom de la Machine"
 $IPMachine  = Read-Host "IP de la Machine"
 $IP_DC1     = Read-Host "DNS de référence du DC1"
