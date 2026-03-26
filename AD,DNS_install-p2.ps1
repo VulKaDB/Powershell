@@ -1,12 +1,19 @@
-$NomDomaine = Read-Host "Confirmez le nom du domaine"
-$NomMachine = Read-Host "Nom de la machine à enregistrer"
-$IPMachine  = Read-Host "Adresse IP de la machine"
+$NomDomaine = Read-Host "Nom du domaine"
+$NomMachine = Read-Host "Nom de la machine"
+$IPMachine  = Read-Host "IP de la machine"
 
-Write-Host "Configuration DNS en cours" -ForegroundColor Cyan
+Write-Host " Configuration DNS " -ForegroundColor Cyan
 
-Add-DnsServerPrimaryZone -Name "$NomDomaine" -ZoneFile "$NomDomaine.dns" -ReplicationScope "Forest" -ErrorAction SilentlyContinue
+Install-WindowsFeature -Name DNS -IncludeManagementTools
 
-Add-DnsServerResourceRecordA -ZoneName "$NomDomaine" -Name "$NomMachine" -IPv4Address "$IPMachine"
+Add-DnsServerPrimaryZone -Name "$NomDomaine" `
+                         -ZoneFile "$NomDomaine.dns" `
+                         -ReplicationScope "Forest" `
+                         -ErrorAction SilentlyContinue
 
-Write-Host "Vérification de l'enregistrement pour $NomMachine.$NomDomaine :" -ForegroundColor Yellow
+Add-DnsServerResourceRecordA -ZoneName "$NomDomaine" `
+                             -Name "$NomMachine" `
+                             -IPv4Address "$IPMachine"
+
+Write-Host "Test Résolution DNS" -ForegroundColor Yellow
 Resolve-DnsName -Name "$NomMachine.$NomDomaine"
