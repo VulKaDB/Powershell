@@ -1,4 +1,4 @@
-$NomDomaine = Read-Host "Entrez le nom du domaine à rejoindre (ex: tssr.lan)"
+$NomDomaine = Read-Host "Entrez le nom du domaine à rejoindre"
 
 Write-Host "Promotion du DC2..." -ForegroundColor Cyan
 
