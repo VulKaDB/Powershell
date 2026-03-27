@@ -8,15 +8,15 @@ echo "            SCRIPT AD + CONFIGURATION WEB            "
 echo "====================================================="
 
 # --- COLLECTE DES INFORMATIONS --- #
-read "Entrez le domaine à rejoindre : " AD_DOMAIN
-read "Entrez le nom du futur site web : " WEBSITE_NAME
-read "Entrez le nom de l'utilisateur : " USERNAME
-read "Entrez le mot de passe pour cet utilisateur : " USERPASS
+read -p "Entrez le domaine AD à rejoindre (ex: tssr.lan) : " AD_DOMAIN
+read -p "Entrez le nom du futur site web (ex: TSSR_WEB) : " WEBSITE_NAME
+read -p "Entrez le nom de l'utilisateur : " USERNAME
+read -p "Entrez le mot de passe pour cet utilisateur : " USERPASS
 
-echo  "--- INSTALLATION DES DEPENDANCES + JONCTION AD ---"
+echo -e "\n--- 2. INSTALLATION DES DEPENDANCES + JONCTION AD ---\n"
 
 sudo apt update
-sudo apt install realmd sssd sssd-tools adcli samba-common-bin packagekit krb5-user -y
+sudo apt install apache2 realmd sssd sssd-tools adcli samba-common-bin packagekit krb5-user -y
 
 echo "Recherche du domaine $AD_DOMAIN..."
 sudo realm discover $AD_DOMAIN
@@ -24,8 +24,9 @@ echo "Integration au domaine en cours..."
 sudo realm join -U Administrateur $AD_DOMAIN
 echo "[OK] Debian est desormais membre du domaine $AD_DOMAIN."
 
-echo "--- CONFIGURATION DU VIRTUALHOST ---"
+echo -e "\n--- CONFIGURATION DU VIRTUALHOST --- \n"
 
+# --- CRÉATION DE L'UTILISATEUR --- #
 if id "$USERNAME" &>/dev/null; then
     echo "[!] L'utilisateur $USERNAME existe deja."
 else
@@ -45,7 +46,7 @@ sudo chmod -R 755 "/var/www/$WEBSITE_NAME"
 echo "[OK] Permissions configurees."
 
 # --- PAGE DE TEST --- #
-echo "<html><body><h1>Bienvenue sur $WEBSITE_NAME</h1><p>Site genere par script automatique.</p></body></html>" | sudo tee "$WEBROOT/index.html" > /dev/null
+echo "<html><body><h1>Bienvenue sur $WEBSITE_NAME</h1><p>Si vous voyez cette page, c'est gagne !</p></body></html>" | sudo tee "$WEBROOT/index.html" > /dev/null
 
 # --- CRÉATION DU VIRTUALHOST --- #
 VHOST_CONF="/etc/apache2/sites-available/$WEBSITE_NAME.conf"
@@ -60,12 +61,15 @@ sudo bash -c "cat > $VHOST_CONF" <<EOF
 EOF
 echo "[OK] Fichier Virtualhost cree."
 
-# --- ACTIVATION ET RELANCE ---
+# --- ACTIVATION DE LA PAGE WEB --- #
+echo "Activation de la nouvelle page web..."
+
+sudo a2dissite 000-default.conf > /dev/null
 sudo a2ensite "$WEBSITE_NAME.conf" > /dev/null
 sudo systemctl reload apache2
 
-echo "====================================================="
-echo "   PROCESSUS TERMINE AVEC SUCCES !                   "
-echo "   1. Machine jointe au domaine : $AD_DOMAIN         "
-echo "   2. Site Web accessible sur : http://$WEBSITE_NAME "
-echo "====================================================="
+echo -e "\n====================================================="
+echo "   PROCESSUS TERMINE AVEC SUCCES !               "
+echo "   Machine jointe au domaine : $AD_DOMAIN        "
+echo "   Site Web accessible sur : http://$WEBSITE_NAME"
+echo -e "\n====================================================="
