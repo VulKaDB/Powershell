@@ -60,11 +60,17 @@ do {
         }
     }
 
-    # --- SUPPRESSION --- #
+    # --- SUPPRESSION D'UN UTILISATEUR --- #
     elseif ($Choix -eq "3") {
-        $UserSuppr = Read-Host "Utilisateur à supprimer"
-        Remove-ADUser -Identity $UserSuppr -Confirm:$false
-        Write-Host "Utilisateur $UserSuppr supprime." -ForegroundColor Red
+        $UserSuppr = Read-Host "Entrez le Nom de famille de l'utilisateur à supprimer"
+        
+        # Vérification de l'existance de l'utilisateur
+        if (Get-ADUser -Filter "SamAccountName -eq '$UserSuppr'") {
+            Remove-ADUser -Identity $UserSuppr -Confirm:$false
+            Write-Host "L'utilisateur $UserSuppr a été supprimé avec succès." -ForegroundColor Green
+        } else {
+            Write-Host "ERREUR : L'identifiant '$UserSuppr' n'existe pas dans l'AD." -ForegroundColor Red
+        }
     }
 
     # --- AUDITS --- #
