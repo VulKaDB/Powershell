@@ -50,9 +50,9 @@ do {
             $Import = Import-Csv -Path $Fichier -Delimiter ","
             foreach ($Ligne in $Import) {
                 $Pass = ConvertTo-SecureString $Ligne.Password -AsPlainText -Force
-                New-ADUser -Name $Ligne.Name -SamAccountName $Ligne.SamAccountName `
+                New-ADUser -Name $Ligne.Prenom -SamAccountName $Ligne.Nom `
                            -Path $CheminOU -AccountPassword $Pass -Enabled $true
-                Write-Host "Import réussi : $($Ligne.Name)" -ForegroundColor Cyan
+                Write-Host "Import réussi : $($Ligne.Prenom)" -ForegroundColor Cyan
             }
         } else {
             Write-Host "ERREUR : Le fichier est introuvable : $Fichier" -ForegroundColor Red
